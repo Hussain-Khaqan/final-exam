@@ -1,57 +1,67 @@
 pipeline {
     agent any
 
+    environment {
+        // If Python is not found, specific the full path to python.exe here
+        // Example: PYTHON_EXE = "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Python\\Python311\\python.exe"
+        PYTHON_EXE = "python" 
+    }
+
     stages {
 
         stage('Clone Repository') {
             steps {
-                // Clones the GitHub repo into Jenkins workspace
                 git branch: 'main', url: 'https://github.com/Hussain-Khaqan/final-exam.git'
+                echo 'Repository cloned successfully'
             }
         }
 
-        stage('Install Dependencies') {
+        stage('Setup Virtual Environment') {
             steps {
-                // Using system Python and installed dependencies
-               echo ' Python and dependencies already installed system-wide'
+                bat '''
+                echo "Creating virtual environment..."
+                "%PYTHON_EXE%" -m venv venv
+                
+                echo "Installing dependencies..."
+                venv\\Scripts\\python -m pip install --upgrade pip
+                venv\\Scripts\\pip install -r requirements.txt
+                '''
             }
         }
 
         stage('Run Unit Tests') {
             steps {
-                bat """
-                REM Run pytest on all test files
-                pytest
-                """
+                bat '''
+                echo "Running tests..."
+                venv\\Scripts\\pytest
+                '''
             }
         }
 
         stage('Build Application') {
             steps {
-                bat """
-                REM Create build directory if it does not exist
+                bat '''
+                echo "Building application..."
                 if not exist build mkdir build
-
-                REM Copy Flask app and requirements for deployment
                 copy app.py build\\
                 copy requirements.txt build\\
-                """
+                '''
             }
         }
 
         stage('Deploy Application') {
             steps {
-                echo 'Deployment simulated: Flask app is ready in the build folder.'
+                echo 'Deployment simulated successfully (Flask app ready)'
             }
         }
     }
 
     post {
         success {
-            echo 'CI/CD Pipeline completed successfully 🎉'
+            echo 'Pipeline completed successfully 🎉'
         }
         failure {
-            echo 'CI/CD Pipeline failed ❌'
+            echo 'Pipeline failed. If "python" is not found, please update the PYTHON_EXE variable in the Jenkinsfile. ❌'
         }
     }
 }
