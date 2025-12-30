@@ -2,42 +2,30 @@ pipeline {
     agent any
 
     environment {
-        // Update this if Python is installed in a custom location
-        PYTHON_HOME = "C:\\Python310" // replace with your Python installation folder
-        PATH = "${env.PYTHON_HOME};${env.PATH}"
+        // Optional: Set if Jenkins service PATH does not include Python
+        // PYTHON_PATH = "C:\\Users\\Hussain\\AppData\\Local\\Programs\\Python\\Python310\\python.exe"
     }
 
     stages {
 
         stage('Clone Repository') {
             steps {
-                echo 'Cloning source code from GitHub...'
+                git branch: 'main', url: 'https://github.com/Hussain-Khaqan/final-exam.git'
+                echo 'Repository cloned successfully from GitHub'
             }
         }
 
         stage('Install Dependencies') {
             steps {
-                bat '''
-                REM Check Python version
-                python --version
-
-                REM Create virtual environment
-                python -m venv venv
-
-                REM Upgrade pip inside venv
-                venv\\Scripts\\pip install --upgrade pip
-
-                REM Install required packages
-                venv\\Scripts\\pip install -r requirements.txt
-                '''
+                echo 'Skipping install: Python and dependencies already installed system-wide'
             }
         }
 
         stage('Run Unit Tests') {
             steps {
                 bat '''
-                REM Run pytest inside virtual environment
-                venv\\Scripts\\pytest
+                REM Run pytest using system Python
+                pytest
                 '''
             }
         }
@@ -45,8 +33,10 @@ pipeline {
         stage('Build Application') {
             steps {
                 bat '''
-                REM Prepare build folder
+                REM Create build folder if it does not exist
                 if not exist build mkdir build
+
+                REM Copy Flask app and requirements for deployment
                 copy app.py build\\
                 copy requirements.txt build\\
                 '''
