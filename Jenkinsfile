@@ -33,7 +33,8 @@ pipeline {
             steps {
                 bat '''
                 echo "Running tests..."
-                venv\\Scripts\\pytest
+                REM Use python -m pytest to ensure we use the installed module
+                venv\\Scripts\\python -m pytest
                 '''
             }
         }
