@@ -13,16 +13,7 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 // Using system Python and installed dependencies
-                bat """
-                REM Check Python version
-                python --version
-
-                REM Upgrade pip just in case
-                python -m pip install --upgrade pip
-
-                REM Ensure required packages are installed
-                python -m pip install -r requirements.txt
-                """
+               echo ' Python and dependencies already installed system-wide'
             }
         }
 
