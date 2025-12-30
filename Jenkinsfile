@@ -5,56 +5,52 @@ pipeline {
 
         stage('Clone Repository') {
             steps {
-                git branch: 'main',
-                    url: 'https://github.com/Hussain-Khaqan/final-exam.git'
+                echo 'Source code cloned automatically from GitHub by Jenkins'
             }
         }
 
         stage('Install Dependencies') {
             steps {
-                sh '''
-                python3 -m venv venv
-                . venv/bin/activate
-                pip install --upgrade pip
-                pip install -r requirements.txt
+                bat '''
+                python --version
+                python -m venv venv
+                venv\\Scripts\\pip install --upgrade pip
+                venv\\Scripts\\pip install -r requirements.txt
                 '''
             }
         }
 
         stage('Run Unit Tests') {
             steps {
-                sh '''
-                . venv/bin/activate
-                pytest
+                bat '''
+                venv\\Scripts\\pytest
                 '''
             }
         }
 
         stage('Build Application') {
             steps {
-                sh '''
-                echo "Preparing application for deployment..."
-                tar -czf flask_app.tar.gz app.py requirements.txt
+                bat '''
+                if not exist build mkdir build
+                copy app.py build\\
+                copy requirements.txt build\\
                 '''
             }
         }
 
         stage('Deploy Application') {
             steps {
-                sh '''
-                echo "Simulating deployment..."
-                echo "Application deployed successfully!"
-                '''
+                echo 'Deployment simulated successfully (Flask app ready)'
             }
         }
     }
 
     post {
         success {
-            echo 'Pipeline completed successfully 🎉'
+            echo 'CI/CD Pipeline completed successfully'
         }
         failure {
-            echo 'Pipeline failed ❌'
+            echo 'CI/CD Pipeline failed'
         }
     }
 }
