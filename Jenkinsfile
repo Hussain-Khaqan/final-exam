@@ -1,51 +1,56 @@
 pipeline {
     agent any
 
-    environment {
-        // Optional: Set if Jenkins service PATH does not include Python
-        // PYTHON_PATH = "C:\\Users\\Hussain\\AppData\\Local\\Programs\\Python\\Python310\\python.exe"
-    }
-
     stages {
 
         stage('Clone Repository') {
             steps {
+                // Clones the GitHub repo into Jenkins workspace
                 git branch: 'main', url: 'https://github.com/Hussain-Khaqan/final-exam.git'
-                echo 'Repository cloned successfully from GitHub'
             }
         }
 
         stage('Install Dependencies') {
             steps {
-                echo 'Skipping install: Python and dependencies already installed system-wide'
+                // Using system Python and installed dependencies
+                bat """
+                REM Check Python version
+                python --version
+
+                REM Upgrade pip just in case
+                python -m pip install --upgrade pip
+
+                REM Ensure required packages are installed
+                python -m pip install -r requirements.txt
+                """
             }
         }
 
         stage('Run Unit Tests') {
             steps {
-                bat '''
-                REM Run pytest using system Python
+                bat """
+                REM Run pytest on all test files
                 pytest
-                '''
+                """
             }
         }
 
         stage('Build Application') {
             steps {
-                bat '''
-                REM Create build folder if it does not exist
+                bat """
+                REM Create build directory if it does not exist
                 if not exist build mkdir build
 
                 REM Copy Flask app and requirements for deployment
                 copy app.py build\\
                 copy requirements.txt build\\
-                '''
+                """
             }
         }
 
         stage('Deploy Application') {
             steps {
-                echo 'Deployment simulated successfully (Flask app ready)'
+                echo 'Deployment simulated: Flask app is ready in the build folder.'
             }
         }
     }
